@@ -1,5 +1,10 @@
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Registration.Services;
+using Registration.Repositories;
+using Registration.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -9,5 +14,13 @@ builder.ConfigureFunctionsWebApplication();
 // builder.Services
 //     .AddApplicationInsightsTelemetryWorkerService()
 //     .ConfigureFunctionsApplicationInsights();
+
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+{
+    options.UseSqlServer(Environment.GetEnvironmentVariable("SqlConnectionString"));
+});
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 
 builder.Build().Run();
