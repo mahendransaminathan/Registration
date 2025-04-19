@@ -17,7 +17,12 @@ builder.ConfigureFunctionsWebApplication();
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
-    options.UseSqlServer(Environment.GetEnvironmentVariable("SqlConnectionString"));
+    var connectionString = builder.Configuration["ConnectionStrings:SqlConnectionString"];
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        throw new InvalidOperationException("The SQL connection string is not configured.");
+    }
+    options.UseSqlServer(connectionString);
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
