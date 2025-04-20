@@ -23,9 +23,11 @@ builder.ConfigureFunctionsWebApplication();
     builder.Services.AddSingleton<CosmosClient>(serviceProvider => 
     {
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-        var cosmosEndPoint = Environment.GetEnvironmentVariable("COSMOS_DB_ENDPOINT");
-        var cosmosKey = Environment.GetEnvironmentVariable("COSMOS_DB_KEY");    
+        // var cosmosEndPoint = Environment.GetEnvironmentVariable("COSMOS_DB_ENDPOINT");
+        // var cosmosKey = Environment.GetEnvironmentVariable("COSMOS_DB_KEY");    
 
+        var cosmosEndPoint = builder.Configuration.GetConnectionString("COSMOS_DB_ENDPOINT");
+        var cosmosKey = builder.Configuration.GetConnectionString("COSMOS_DB_KEY");    
         if (string.IsNullOrEmpty(cosmosKey))
         {
             throw new ArgumentNullException("COSMOS_DB_KEY", "❌ Cosmos DB Key is missing");
@@ -49,6 +51,5 @@ builder.ConfigureFunctionsWebApplication();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
  }
 builder.Services.AddScoped<IUserService, UserService>();
-
 
 builder.Build().Run();
