@@ -15,16 +15,37 @@ builder.ConfigureFunctionsWebApplication();
 //     .AddApplicationInsightsTelemetryWorkerService()
 //     .ConfigureFunctionsApplicationInsights();
 
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
-{
-    var connectionString = builder.Configuration["ConnectionStrings:SqlConnectionString"];
-    if (string.IsNullOrEmpty(connectionString))
+
+ if (builder.Configuration["DatabaseString:SelectedDatabase"] == "CosmosDB")
+ {
+    builder.Services.AddSingleton<CosmosClient>(serviceProvider => 
     {
-        throw new InvalidOperationException("The SQL connection string is not configured.");
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var cosmosEndPoint = Environment.GetEnvironmentVariable("COSMOS_DB_ENDPOINT");
+        var cosmosKey = Environment.GetEnvironmentVariable("COSMOS_DB_KEY");    
+
+        if (string.IsNullOrEmpty(cosmosKey))
+        {
+            throw new ArgumentNullException("COSMOS_DB_KEY", "❌ Cosmos DB Key is missing");
+        }
+        return new CosmosClient(cosmosEndPoint, cosmosKey);
     }
-    options.UseSqlServer(connectionString);
-});
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+    );
+    builder.Services.AddScoped<IUserRepository, UserCosmosRepository>();
+ }
+ else
+ {
+        builder.Services.AddDbContext<ApplicationDBContext>(options =>
+        {
+            var connectionString = builder.Configuration["ConnectionStrings:SqlConnectionString"];
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("The SQL connection string is not configured.");
+            }
+            options.UseSqlServer(connectionString);
+        });
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+ }
 builder.Services.AddScoped<IUserService, UserService>();
 
 
