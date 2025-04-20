@@ -1,6 +1,5 @@
 
 using Microsoft.Azure.Cosmos;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 
 public class UserCosmosRepository : IUserRepository

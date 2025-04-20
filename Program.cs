@@ -5,6 +5,8 @@ using Registration.Services;
 using Registration.Repositories;
 using Registration.Data;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
